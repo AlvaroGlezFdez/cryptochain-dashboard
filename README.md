@@ -1,85 +1,62 @@
 # CryptoChain Insights Dashboard
 
-**Estudiante:** Álvaro González Fernández  
-**GitHub User:** AlvaroGlezFdez  
-**Asignatura:** Criptografía  
-**Institución:** Universidad Alfonso X el Sabio (UAX)  
-**Profesor:** Jorge Calvo  
+Real-time **Streamlit** dashboard that connects to a public Bitcoin API and visualizes
+live cryptographic metrics of the network, applying core cryptography concepts —
+**SHA-256, Proof of Work and difficulty adjustment** — to real on-chain data, plus an
+**anomaly-detection** component. Individual academic project for the *Cryptography*
+course (B.Sc. in Mathematical Engineering, UAX).
 
----
+## What it does
 
-## Descripción del Proyecto
+The dashboard is organised in four modules (tabs):
 
-**CryptoChain Insights Dashboard** es un panel de control interactivo desarrollado en Python con Streamlit para visualizar y analizar métricas criptográficas de la red Bitcoin en tiempo real. El proyecto aplica conceptos teóricos como SHA-256, Proof of Work y ajuste de dificultad sobre datos reales obtenidos de APIs públicas (Blockstream, Mempool.space).
+- **M1 · PoW Monitor** — difficulty, inter-block times and block flow over the last
+  blocks. Computes the mining **target from the block `bits`** field and the number of
+  required **leading zero bits**.
+- **M2 · Block Header** — decodes the six fields of a block header and verifies the
+  **double SHA-256** hash against the target.
+- **M3 · Difficulty History** — difficulty across **2016-block adjustment periods**,
+  with the real-time / 600 s ratio (whether blocks were found faster or slower than the
+  10-minute target).
+- **M4 · Anomaly Detector** — models block inter-arrival times as a **Poisson process**
+  (exponential distribution, mean 600 s) and flags statistically anomalous blocks with a
+  two-tailed test (α = 0.05).
 
----
+## Data source
 
-## Enfoque de IA — Módulo M4
+Real-time data from the **public Blockstream API** (`blockstream.info/api`). No API keys
+or credentials required.
 
-**Tipo:** Detector de Anomalías  
-**Objetivo:** Identificar bloques cuyo tiempo de llegada (inter-arrival time) sea estadísticamente anormal respecto al comportamiento esperado de la red.  
-**Metodología:** Se modela el tiempo entre bloques mediante una distribución exponencial con media 600 s (baseline teórico de Bitcoin). Los bloques que superen el umbral del percentil 95 o estén por debajo del percentil 5 se clasifican como anomalías y se resaltan visualmente en el dashboard.
+## Cryptography concepts applied
 
----
+SHA-256 (double hashing for header verification) · Proof of Work, target and difficulty ·
+difficulty re-adjustment every 2016 blocks · block discovery modelled as a Poisson process.
 
-## Estado de los Módulos
+## Tech stack
 
-| Módulo | Descripción | Estado |
-| :--- | :--- | :--- |
-| **M1** | Monitor de Proof of Work (dificultad, hash rate, tiempos entre bloques) | 🚧 En desarrollo |
-| **M2** | Analizador de Header de Bloque (6 campos, verificación SHA-256², bits a cero) | 🚧 En desarrollo |
-| **M3** | Historial de Dificultad (periodos de 2016 bloques, ratio tiempo_real/600 s) | 🚧 En desarrollo |
-| **M4** | IA — Detector de Anomalías (distribución exponencial) | 🚧 En desarrollo |
+Python · Streamlit · Plotly · pandas · NumPy · SciPy · requests
 
----
+## How to run
 
-## Progreso Actual
-
-- [x] Repositorio de GitHub Classroom aceptado y clonado localmente
-- [x] Estructura de carpetas configurada (`api/`, `modules/`, `report/`)
-- [x] Cliente API funcional en `api/blockchain_client.py` — recupera el último bloque en tiempo real (altura, hash, dificultad, nonce)
-- [x] README completo con información del estudiante y enfoque de IA
-- [ ] Implementación de módulos M1–M4
-- [ ] Tests de integración y validación de la verificación local del PoW
-
----
-
-## Próximo Paso
-
-Implementar **M1** (Monitor de Proof of Work) y **M2** (Analizador de Header): añadir las funciones `get_block()` y `get_difficulty_history()` al cliente API y conectarlas a los tabs del dashboard.
-
----
-
-## Bloqueadores
-
-Ninguno actualmente.
-
----
-
-## Instrucciones de Ejecución
-
-```bash
-# 1. Instalar dependencias
+​```bash
 pip install -r requirements.txt
-
-# 2. Lanzar el dashboard
 streamlit run app.py
-```
+​```
 
-<!-- student-repo-auditor:teacher-feedback:start -->
-## Teacher Feedback
+## Repository structure
 
-### Kick-off Review
+​```
+├── app.py                     # Streamlit entry point (4 tabs)
+├── api/
+│   └── blockchain_client.py   # Blockstream API client (blocks, headers, difficulty)
+├── modules/
+│   ├── m1_pow_monitor.py      # Proof of Work monitor
+│   ├── m2_block_header.py     # block header decoder + SHA-256 verification
+│   ├── m3_difficulty_history.py
+│   └── m4_ai_component.py     # anomaly detector (exponential model)
+├── .streamlit/config.toml
+└── requirements.txt
+​```
 
-Review time: 2026-04-29 20:44 CEST
-Status: Green
-
-Strength:
-- I can see the dashboard structure integrating the checkpoint modules.
-
-Improve now:
-- The README should now reflect the checkpoint more explicitly, including progress, blockers, and updated module status.
-
-Next step:
-- Update the README so progress, blockers, module status, and next step match the checkpoint format exactly.
-<!-- student-repo-auditor:teacher-feedback:end -->
+---
+*Individual academic project · Cryptography · Universidad Alfonso X el Sabio (UAX) · 2025–2026.*
